@@ -18,7 +18,8 @@ address public storeAddress;
 
 event TokensRedeemed(address indexed redeemer, address indexed storeAddress, uint256 amount);
 
-storeAddress = address(0x1234567890AbcdEF1234567890aBcdef12345678);
+constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {
+        storeAddress = address(0x1234567890AbcdEF1234567890aBcdef12345678); // Default store address
 }
 function setStoreAddress(address _storeAddress) external onlyOwner {
 storeAddress = _storeAddress;
