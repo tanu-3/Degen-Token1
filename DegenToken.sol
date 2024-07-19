@@ -12,62 +12,72 @@ contract DegenToken is ERC20, Ownable {
         uint C;
     }
 
- mapping(address => TokenCards) public userCards;
- 
-address public storeAddress;
+    mapping(address => TokenCards) public userCards;
+    
+    address public storeAddress;
 
-event TokensRedeemed(address indexed redeemer, address indexed storeAddress, uint256 amount);
+    event TokensRedeemed(address indexed redeemer, address indexed storeAddress, uint256 amount, string item);
 
-constructor() ERC20("Degen", "DGN") Ownable(msg.sender) {
+    constructor() ERC20("Degen", "DGN") Ownable() {
         storeAddress = address(0x1234567890AbcdEF1234567890aBcdef12345678); // Default store address
-}
-function setStoreAddress(address _storeAddress) external onlyOwner {
-storeAddress = _storeAddress;
-}
-function mint(address to, uint256 amount) public onlyOwner {
-   require(to != address(0), "Cannot mint to zero address");
-   require(amount > 0, "Amount must be greater than zero");
-   _mint(to, amount);
-}
-function decimals() public pure override returns (uint8) { 
-   return 18; 
-}
-function getBalance() external view returns (uint256) {
-    return balanceOf(msg.sender);
-}
-function transferTokens(address _receiver, uint256 _amount) external {
-    require(balanceOf(msg.sender) >= _amount, "You do not have enough Degen tokens");
-    _transfer( msg.sender,_receiver, _amount);
-}
-function burnTokens(uint256 _value) external {
-    require(balanceOf(msg.sender) >= _value, "You do not have enough Degen Tokens");
-    _burn(msg.sender, _value);
-}    
-function redeemTokens( uint input) external returns (string memory) {
-    TokenCards storage userCard = userCards[msg.sender];
+    }
 
-      uint price;
+    function setStoreAddress(address _storeAddress) external onlyOwner {
+        storeAddress = _storeAddress;
+    }
+
+    function mint(address to, uint256 amount) public onlyOwner {
+        require(to != address(0), "Cannot mint to zero address");
+        require(amount > 0, "Amount must be greater than zero");
+        _mint(to, amount);
+    }
+
+    function decimals() public pure override returns (uint8) { 
+        return 18; 
+    }
+
+    function getBalance() external view returns (uint256) {
+        return balanceOf(msg.sender);
+    }
+
+    function transferTokens(address _receiver, uint256 _amount) external {
+        require(balanceOf(msg.sender) >= _amount, "You do not have enough Degen tokens");
+        _transfer(msg.sender, _receiver, _amount);
+    }
+
+    function burnTokens(uint256 _value) external {
+        require(balanceOf(msg.sender) >= _value, "You do not have enough Degen Tokens");
+        _burn(msg.sender, _value);
+    }    
+    
+    function redeemTokens(uint input) external returns (string memory) {
+        TokenCards storage userCard = userCards[msg.sender];
+
+        uint price;
+        string memory item;
         if (input == 1) {
-            price = 100;
+            price = 100 * 10**decimals();
             require(balanceOf(msg.sender) >= price, "You do not have enough tokens to redeem Item A");
             userCard.A++;
+            item = "Item A";
         } else if (input == 2) {
-            price = 200;
+            price = 200 * 10**decimals();
             require(balanceOf(msg.sender) >= price, "You do not have enough tokens to redeem Item B");
             userCard.B++;
+            item = "Item B";
         } else if (input == 3) {
-            price = 300;
+            price = 300 * 10**decimals();
             require(balanceOf(msg.sender) >= price, "You do not have enough tokens to redeem Item C");
             userCard.C++;
+            item = "Item C";
         } else {
             return "Unknown token card";
         }
         
         _burn(msg.sender, price);
-
         require(storeAddress != address(0), "Store address is not set");
 
-        emit TokensRedeemed(msg.sender, storeAddress, price);
+        emit TokensRedeemed(msg.sender, storeAddress, price, item);
 
         return "Tokens redeemed successfully";
     }
@@ -76,6 +86,3 @@ function redeemTokens( uint input) external returns (string memory) {
         return balanceOf(account);
     }
 }
-
-
-               
