@@ -17,6 +17,7 @@ contract DegenToken is ERC20, Ownable {
     address public storeAddress;
 
     event TokensRedeemed(address indexed redeemer, address indexed storeAddress, uint256 amount, string item);
+    event ItemDelivered(address indexed user, string item);
 
     constructor() ERC20("Degen", "DGN") Ownable() {
         storeAddress = address(0x1234567890AbcdEF1234567890aBcdef12345678); // Default store address
@@ -49,7 +50,7 @@ contract DegenToken is ERC20, Ownable {
         require(balanceOf(msg.sender) >= _value, "You do not have enough Degen Tokens");
         _burn(msg.sender, _value);
     }    
-    
+
     function redeemTokens(uint input) external returns (string memory) {
         TokenCards storage userCard = userCards[msg.sender];
 
@@ -78,8 +79,9 @@ contract DegenToken is ERC20, Ownable {
         require(storeAddress != address(0), "Store address is not set");
 
         emit TokensRedeemed(msg.sender, storeAddress, price, item);
+        emit ItemDelivered(msg.sender, item); // Emitting event to simulate item delivery
 
-        return "Tokens redeemed successfully";
+        return "Tokens redeemed and item delivered successfully";
     }
 
     function checkBalance(address account) external view returns (uint256) {
